@@ -19,7 +19,7 @@ multimodal_module/ </br>
 ## Usage 
 Refer to the scripts folder to run the unsupervised method for changepoint detection.
 
-Get UCP timestamp-scores given a segment (path: scripts/exps)
+Get UCP timestamp-scores given a segment (path: scripts/exps) with shape (number of detected tracks, number of timestamps)
 ```
 sh get_UCP_scores.sh
 ```

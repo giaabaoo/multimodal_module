@@ -6,6 +6,7 @@ from inference_functions import get_unsupervised_scores
 from tqdm import tqdm
 from moviepy.editor import *
 from utils import get_args_parser
+import pdb
 
 def inference(df, output_path, config, ES_extractor):
     for index, row in tqdm(df.iterrows(), mininterval=0.1):
@@ -22,7 +23,9 @@ def inference(df, output_path, config, ES_extractor):
             print('...Result file exists, skipping...')
             continue
         
-        get_unsupervised_scores(config, ES_extractor)  
+        # Timestamp-level scores with shape (number of detected tracks, number of timestamps)
+        pdb.set_trace()
+        score_cp_matrix_ts, binary_cp_matrix_ts = get_unsupervised_scores(config, ES_extractor)  
         
 if __name__ == "__main__":
     ##### Defining arguments #####
