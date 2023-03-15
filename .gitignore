@@ -1,5 +1,6 @@
 output/*
 tools/
+trash/
 
 */__pycache__
 *.pyc
