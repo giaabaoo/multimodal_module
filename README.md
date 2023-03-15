@@ -7,14 +7,14 @@ conda create --name multimodal_module python==3.10
 ```
 
 ## Folder structure
-multimodal_module/
-├── README.md
-├── configs/
-├── data/
-├── output/
-├── scripts/
-├── tools/
-├── unsupervised/
+multimodal_module/ </br>
+├── README.md </br>
+├── configs/ </br>
+├── data/ </br> 
+├── output/ </br>
+├── scripts/ </br>
+├── tools/ </br>
+├── unsupervised/ </br>
 
 ## Usage 
 Refer to the scripts folder to run the unsupervised method for changepoint detection.
