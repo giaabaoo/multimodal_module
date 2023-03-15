@@ -19,12 +19,17 @@ multimodal_module/ </br>
 ## Usage 
 Refer to the scripts folder to run the unsupervised method for changepoint detection.
 
+Get UCP timestamp-scores given a segment (path: scripts/exps)
+```
+sh get_UCP_scores.sh
+```
+
 Prepare data
 ```
 sh prepare_full_data.sh
 ```
 
-Inference on full data. 
+Inference on full data
 ```
 sh prepare_full_data.sh
 ```
