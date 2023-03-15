@@ -3,7 +3,8 @@
 
 ```
 conda create --name multimodal_module python==3.10
-
+conda env update -n multimodal_module --file environment.yml
+pip install requirements.txt
 ```
 
 ## Folder structure
