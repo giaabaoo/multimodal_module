@@ -1,0 +1,21 @@
+pipeline:
+  output_path: output/full_data # inference on full data using visual and audio features
+  device: cuda
+
+dataset:
+  input_path: data/full_data.csv
+  
+
+network:
+  threshold_face: 0.6
+  model_name: enet_b0_8_best_afew
+  threshold_dying_track_len: 30
+  threshold_iou_min_track: 0.4
+  # min_frame_per_second: 3 # skip frame info.
+  max_idx_frame_debug: null
+  len_face_tracks: 30
+  num_intervals: 2
+  max_cp_found: 1
+  # min_seconds_per_segment: 200
+  min_face_size: 50
+  # visualize_debug_face_track: True

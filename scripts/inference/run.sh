@@ -1,0 +1,2 @@
+cd ../../
+python inference.py
