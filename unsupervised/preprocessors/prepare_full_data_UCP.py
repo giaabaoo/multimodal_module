@@ -32,8 +32,8 @@ if __name__ == '__main__':
     })
 
     # Read in the changepoint_preprocessed.csv file
-    changepoint_file = args.changepoint_file
-    changepoint_df = pd.read_csv(changepoint_file)
+    changepoints_file = args.changepoints_file
+    changepoint_df = pd.read_csv(changepoints_file)
 
     # Add a "label" column to the segment dataframe with a default value of 0
     segment_path_df['label'] = 0
