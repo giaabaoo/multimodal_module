@@ -14,7 +14,7 @@ from facenet_pytorch import MTCNN
 from hsemotion.facial_emotions import HSEmotionRecognizer
 from dotmap import DotMap
 import os 
-from main_modules.ES_extractor.visual_feat_BAO import VisualES
+from unsupervised.main_modules.ES_extractor.visual_feat_BAO import VisualES
 import argparse
 from pathlib import Path
 import os
@@ -24,12 +24,12 @@ import numpy as np
 
 def get_batch_df(config):
     if config.network.use_audio_features:
-        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised/multimodal_module/output/batches_audio"
+        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/output/batches_audio"
     else:
-        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised/multimodal_module/output/batches"
+        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/output/batches"
     output_path = os.path.join(folder_path, f"batch_{config.batch_idx}")
     Path(output_path).mkdir(parents=True, exist_ok=True)
-    csv_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised/multimodal_module/data/batches"
+    csv_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/data/batches"
     df = pd.read_csv(os.path.join(csv_path, f"batch_{config.batch_idx}.csv"))
     
     return df, output_path
