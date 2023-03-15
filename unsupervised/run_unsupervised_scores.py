@@ -24,7 +24,6 @@ def inference(df, output_path, config, ES_extractor):
             continue
         
         # Timestamp-level scores with shape (number of detected tracks, number of timestamps)
-        pdb.set_trace()
         score_cp_matrix_ts, binary_cp_matrix_ts = get_unsupervised_scores(config, ES_extractor)  
         
 if __name__ == "__main__":
