@@ -3,8 +3,7 @@
 
 ```
 conda create --name multimodal_module python==3.10
-conda env update -n multimodal_module --file environment.yml
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Folder structure
@@ -20,18 +19,51 @@ multimodal_module/ </br>
 ## Usage 
 Refer to the scripts folder to run the unsupervised method for changepoint detection.
 
-Get UCP timestamp-scores given a segment (path: scripts/exps) with shape (number of detected tracks, number of timestamps)
+Get UCP timestamp-scores given a segment (path: scripts/exps) with shape (number of detected tracks, number of timestamps):
 ```
 sh get_UCP_scores.sh
 ```
 
-Prepare data
+### Data preparation
+Prepare csv file containing changepoint and non-changepoint segments:
 ```
 sh prepare_full_data.sh
 ```
 
-Inference on full data
+For faster inference, it is recommended to split the full data into batches (default 1000 segments per batch) and run them in parallel:
 ```
-sh prepare_full_data.sh
+sh split_batch_training.sh
 ```
 
+### Inference
+Inference on full data using a single annotation file (currently ineffective):
+```
+sh run.sh
+```
+
+Inference on full data using a multiple files (batches). On each machine, specify the batch_idx incrementally.
+On machine 1: 
+```
+sh run_batch1.sh
+```
+On machine 2: 
+```
+sh run_batch2.sh
+```
+
+Inference on positve data only (segments with changepoints):
+```
+sh run_positive_data.sh
+```
+
+### Evaluation
+There are two modes of evaluation according to the inference strategies.
+Evaluate on all batches:
+```
+sh evaluate_all_batches.sh
+```
+
+Evaluate on a single file:
+```
+sh evaluate_single_file.sh
+```

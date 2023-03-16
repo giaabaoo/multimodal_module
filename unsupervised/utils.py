@@ -1,12 +1,4 @@
 import argparse
-
-def get_args_parser():
-    parser = argparse.ArgumentParser("Parsing arguments", add_help=False)
-    parser.add_argument("--config", default="./configs/default.yaml", type=str)
-    parser.add_argument("--batch_idx", default=-1, type=int)
-
-    return parser
-
 import yaml
 from pathlib import Path
 import pandas as pd
@@ -14,13 +6,21 @@ from facenet_pytorch import MTCNN
 from hsemotion.facial_emotions import HSEmotionRecognizer
 from dotmap import DotMap
 import os 
-from unsupervised.main_modules.ES_extractor.visual_feat_BAO import VisualES
+from main_modules.ES_extractor.visual_feat_BAO import VisualES
 import argparse
 from pathlib import Path
 import os
 import pdb
 import matplotlib.pyplot as plt
 import numpy as np
+
+def get_args_parser():
+    parser = argparse.ArgumentParser("Parsing arguments", add_help=False)
+    parser.add_argument("--config", default="./configs/default.yaml", type=str)
+    parser.add_argument("--batch_idx", default=-1, type=int)
+    parser.add_argument("--test_path", default=None, type=int)
+
+    return parser
 
 def get_batch_df(config):
     if config.network.use_audio_features:
@@ -40,8 +40,6 @@ def prepare_configs(args):
         config_dict = yaml.safe_load(f)
     print(config_dict)
     config = DotMap(config_dict)
-    # config.dataset.input_path = os.path.join("..", config.dataset.input_path)
-    # config.pipeline.output_path = os.path.join("..", config.pipeline.output_path)
     config.batch_idx = args.batch_idx
     
     return config

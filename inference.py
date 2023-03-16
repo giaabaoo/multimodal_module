@@ -1,12 +1,12 @@
 import os 
 import argparse
-from unsupervised.inference_functions import run_pipeline_single_video
-from unsupervised.utils import prepare_configs, prepare_architectures
+import sys
+sys.path.append("unsupervised")
+from inference_functions import run_pipeline_single_video
+from utils import prepare_configs, prepare_architectures, get_args_parser
 from tools.debug.debug import *
 from tqdm import tqdm
 from moviepy.editor import *
-
-from tools.helper import *
 
 def inference(df, output_path, config, ES_extractor):
     for index, row in tqdm(df.iterrows(), mininterval=0.1):

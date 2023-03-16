@@ -40,6 +40,7 @@ if __name__ == '__main__':
         'start_second': merged_df['start_second'],
         'end_second': merged_df['end_second']
     })
+    segment_path_df['label'] = 1
 
     # Write the segment IDs, file paths, start and end timestamps to the new CSV file
     segment_path_df.to_csv(new_csv_file, index=False)
