@@ -1,5 +1,7 @@
 import os 
 import argparse
+import sys
+sys.path.append("..")
 
 from utils import prepare_architectures, prepare_configs
 from inference_functions import get_unsupervised_scores

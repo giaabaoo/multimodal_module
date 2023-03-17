@@ -4,11 +4,11 @@ from datetime import datetime
 import logging
 import numpy as np 
 import torch
-from unsupervised.main_modules.CP_aggregator.segment_core import UniformSegmentator
-from unsupervised.main_modules.CP_aggregator.aggregator_core import SimpleAggregator
-from unsupervised.main_modules.ES_extractor.ES_audio.audio_feat import get_audio_features
-from unsupervised.main_modules.UCP.inference_ucp import detect_CP_tracks
-from unsupervised.utils import draw_result_graph
+from main_modules.CP_aggregator.segment_core import UniformSegmentator
+from main_modules.CP_aggregator.aggregator_core import SimpleAggregator
+from main_modules.ES_extractor.ES_audio.audio_feat import get_audio_features
+from main_modules.UCP.inference_ucp import detect_CP_tracks
+from utils import draw_result_graph
 import pdb
 
 def get_unsupervised_scores(config, ES_extractor):
@@ -38,7 +38,6 @@ def get_unsupervised_scores(config, ES_extractor):
     es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
     
     if config.network.use_audio_features:
-        pdb.set_trace()
         audio_signals, audio_start_end_offset_track = get_audio_features(video)
         es_signals += audio_signals
         all_start_end_offset_track += audio_start_end_offset_track
