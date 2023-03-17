@@ -4,11 +4,11 @@ from datetime import datetime
 import logging
 import numpy as np 
 import torch
-from main_modules.CP_aggregator.segment_core import UniformSegmentator
-from main_modules.CP_aggregator.aggregator_core import SimpleAggregator
-from code.my_code.unsupervised_approach.multimodal_module.unsupervised.main_modules.ES_extractor.ES_audio.audio_feat import get_audio_features
-from main_modules.UCP.inference_ucp import detect_CP_tracks
-from utils import draw_result_graph
+from unsupervised.main_modules.CP_aggregator.segment_core import UniformSegmentator
+from unsupervised.main_modules.CP_aggregator.aggregator_core import SimpleAggregator
+from unsupervised.main_modules.ES_extractor.ES_audio.audio_feat import get_audio_features
+from unsupervised.main_modules.UCP.inference_ucp import detect_CP_tracks
+from unsupervised.utils import draw_result_graph
 import pdb
 
 def get_unsupervised_scores(config, ES_extractor):

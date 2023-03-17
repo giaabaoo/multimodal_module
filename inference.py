@@ -1,9 +1,9 @@
 import os 
 import argparse
-import sys
-sys.path.append("unsupervised")
-from inference_functions import run_pipeline_single_video
-from utils import prepare_configs, prepare_architectures, get_args_parser
+# import sys
+# sys.path.append("unsupervised")
+from unsupervised.inference_functions import run_pipeline_single_video
+from unsupervised.utils import prepare_configs, prepare_architectures, get_args_parser
 from tools.debug.debug import *
 from tqdm import tqdm
 from moviepy.editor import *

@@ -6,7 +6,7 @@ from facenet_pytorch import MTCNN
 from hsemotion.facial_emotions import HSEmotionRecognizer
 from dotmap import DotMap
 import os 
-from main_modules.ES_extractor.visual_feat_BAO import VisualES
+from unsupervised.main_modules.ES_extractor.ES_visual.visual_feat import VisualES
 import argparse
 from pathlib import Path
 import os
