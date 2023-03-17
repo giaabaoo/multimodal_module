@@ -109,14 +109,12 @@ def get_unsupervised_scores(config, ES_extractor):
                     max_score_idx = np.argmax(track_scores)
                     binary_cp_matrix_ts[track_idx, ts] = binary_cp_matrix[track_idx, start_frame + max_score_idx]
                     score_cp_matrix_ts[track_idx, ts] = track_scores[max_score_idx]
-
-
             
         ### Debug converting frame-level scores into timestamp-level
         draw_result_graph(config, score_cp_matrix, score_cp_matrix_ts)
     return score_cp_matrix_ts, binary_cp_matrix_ts
 
-def run_pipeline_single_video(config, ES_extractor):
+def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
     # load video file
     video = VideoFileClip(config.single_video_path)
 
@@ -148,8 +146,19 @@ def run_pipeline_single_video(config, ES_extractor):
     # extract ES signals, all emotion category tracks, and all start-end offset tracks
     es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
     
+    pdb.set_trace()
     if config.network.use_audio_features:
-        audio_signals, audio_start_end_offset_track = get_audio_features(video)
+        audio_path = config.single_video_path.replace("all_videos","segmented_videos_audio") ### should add audio path to df later
+        audio_out = AudioES_extractor.process_audio_file(audio_path, "")
+        audio_results, audio_embedding, audio_features, raw_audio, audio_sampling_rate, audio_duration = audio_out
+        if audio_results is not None:
+            audio_emo_pred, audio_emo_feat = process_audio_emotions(
+                    audio_results, audio_embedding,
+                    n_timesteps=int(np.round(duration=15))
+                )
+        print(f"Audio duration: {audio_duration}")
+        
+        ### find a way to append to es signals frames by frames
         es_signals += audio_signals
         all_start_end_offset_track += audio_start_end_offset_track
         

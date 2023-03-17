@@ -42,25 +42,33 @@ def prepare_configs(args):
     config = DotMap(config_dict)
     config.batch_idx = args.batch_idx
     
-    return config
-
-def prepare_architectures(config):
-    ##### Initialize Model #####
-    face_detector = MTCNN(keep_all=False, post_process=False, min_face_size=config.network.min_face_size, device=config.pipeline.device)
-    emotion_recognizer = HSEmotionRecognizer(model_name=config.network.model_name, device=config.pipeline.device)
-    
-    ES_extractor = VisualES(config)
-    ES_extractor.initialize_model(face_detector, emotion_recognizer)
     if config.batch_idx != -1:
         config.batch_idx = config.batch_idx
         df, output_path = get_batch_df(config)
     else:
         df = pd.read_csv(config.dataset.input_path)
         output_path = config.pipeline.output_path
-    
+    config.df = df
+    config.output_path = output_path
     Path(output_path).mkdir(parents=True, exist_ok=True)
     
-    return ES_extractor, df, output_path
+    return config
+
+def prepare_architectures(config):
+    """Initialize Model"""  
+    ##### Visual ES Extractor #####
+    face_detector = MTCNN(keep_all=False, post_process=False, min_face_size=config.network.min_face_size, device=config.pipeline.device)
+    emotion_recognizer = HSEmotionRecognizer(model_name=config.network.model_name, device=config.pipeline.device)
+    
+    ES_extractor = VisualES(config)
+    ES_extractor.initialize_model(face_detector, emotion_recognizer)
+    
+    ##### Audio ES Extractor #####
+    
+    AudioES_extractor = AudioES(config)
+    AudioES_extractor.initialize_model()
+    
+    return ES_extractor, AudioES_extractor
 
 def draw_result_graph(config, score_cp_matrix, score_cp_matrix_ts):
     # assign a color to each track for plotting

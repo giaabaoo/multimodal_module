@@ -117,90 +117,17 @@ class VisualES():
             interpolate_all_tracks.append(current_track)
 
         return interpolate_all_tracks
-            
-
-    # def extract_sequence_frames(self, video_path):
-    #     print("==========Extracting ES features==============")
-    #     # find all face tracks in a video
-    #     all_face_tracks = self.find_face_tracks(video_path)
-
-    #     softmax = torch.nn.Softmax(dim=1)
-
-    #     #### Preprocessing facial tracks
-
-    #     # filter noisy tracks       
-    #     all_face_tracks = self.filter_noisy_track(all_face_tracks)
-
-    #     # interpolate facial tracks
-    #     ### !!!!! NO Interpolation here !!!!!!!
-    #     all_face_tracks = self.interpolate_track(all_face_tracks)
-
-    #     # iterate and extract
-    #     all_es_feat_tracks = []
-    #     all_emotion_category_tracks = []
-    #     all_start_end_offset_track = []
-
-    #     # This is for debugging visualization only
-    #     cap = cv2.VideoCapture(video_path)
-
-    #     for each_track in all_face_tracks:
-    #         frames_appear = each_track['frames_appear']
-    #         bbox = each_track['bbox']
-            
-    #         facial_img_track = []
-    #         es_feature_track = []
-    #         emotion_cat_track = []
-
-    #         start_end_track = (frames_appear[0], frames_appear[-1])
-
-    #         for each_frame, each_box in zip(frames_appear, bbox):
-    #             [x1, y1, x2, y2] = each_box
-
-
-    #             cap.set(cv2.CAP_PROP_POS_FRAMES, each_frame)
-
-    #             ret, frame = cap.read()
-
-    #             x1, x2  = min(max(0, x1), frame.shape[1]), min(max(0, x2), frame.shape[1])
-    #             y1, y2 = min(max(0, y1), frame.shape[0]), min(max(0, y2), frame.shape[0])
-
-    #             face_imgs = frame[y1:y2, x1:x2]
-    #             emotion, scores = self.emotion_recognizer.predict_emotions(face_imgs, logits=True)
-    #             scores = softmax(torch.Tensor(np.array([scores])))
-
-    #             es_feature_track.append(scores[0].tolist())
-    #             emotion_cat_track.append(emotion)
-
-    #             facial_img_track.append(face_imgs) # this is just for visualization, comment this
-
-    #         es_feature_track = np.array(es_feature_track)
-
-    #         # debug writing here
-    #         # for idx, each_face_track_img in enumerate(facial_img_track):
-    #         #     name_path = os.path.join('./test_facial_track_debug', str(idx)+'.png')
-    #         #     cv2.imwrite(name_path, each_face_track_img)
-
-
-    #         all_emotion_category_tracks.append(emotion_cat_track)
-    #         all_es_feat_tracks.append(es_feature_track)
-    #         all_start_end_offset_track.append(start_end_track)
-        
-    #     cap.release()
-
-    #     return all_es_feat_tracks, all_emotion_category_tracks, all_start_end_offset_track
-
 
     def extract_sequence_frames(self, clip):
-        # finding all face tracks in video. A face track is defined as t = (l, t) where:
-        #   + l represents for list of face location for that track
-        #   + t represents for frame-index to the video of that track
-        # print("===========Finding face tracks==============")
-        # cap = cv2.VideoCapture(video_path)
-        # frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        # width = int(cap.get(3)) # get width
-        # height = int(cap.get(4)) #get height
+        """
+        Finding all face tracks in video. 
+            A face track is defined as t = (l, t) where:
+            + l represents for list of face location for that track
+            + t represents for frame-index to the video of that track
+        """ 
 
         # clip = VideoFileClip(video_path)
+        print("===========Finding face tracks==============")
         frame_count = int(clip.fps * clip.duration)
         width = int(clip.w)
         height = int(clip.h)
@@ -222,8 +149,8 @@ class VisualES():
             fourcc = cv2.VideoWriter_fourcc(*'MPEG')
             output = cv2.VideoWriter(os.path.join('./test_debug_output', 'out_test_vid.mp4'), fourcc, 5.0, (width, height))
 
-        # for idx, frame in tqdm(enumerate(frames_list), total=len(frames_list)):
-        for idx, frame in enumerate(frames_list):
+        for idx, frame in tqdm(enumerate(frames_list), total=len(frames_list)):
+        # for idx, frame in enumerate(frames_list):
             # skip frame
             idx_frame += 1
             # if idx_frame % self.args.skip_frame != 0:

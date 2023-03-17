@@ -4,6 +4,7 @@
 ```
 conda create --name multimodal_module python==3.10
 pip install -r requirements.txt
+conda install -y ffmpeg
 ```
 
 ## Folder structure
