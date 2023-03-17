@@ -58,6 +58,7 @@ sh run_positive_data.sh
 
 ### Evaluation
 There are two modes of evaluation according to the inference strategies.
+
 Evaluate on all batches:
 ```
 sh evaluate_all_batches.sh
