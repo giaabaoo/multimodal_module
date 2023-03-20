@@ -42,7 +42,7 @@ Inference on full data using a single annotation file (currently ineffective):
 sh run.sh
 ```
 
-Inference on full data using a multiple files (batches). On each machine, specify the batch_idx incrementally.
+Inference on full data using a multiple files (batches). On each machine, specify the batch_idx incrementally. Currently using minieval.yaml for inference on minieval data.
 On machine 1: 
 ```
 sh run_batch1.sh
@@ -59,6 +59,11 @@ sh run_positive_data.sh
 
 ### Evaluation
 There are two modes of evaluation according to the inference strategies.
+
+Evaluate on minieval batches:
+```
+sh evaluate_minieval.sh
+```
 
 Evaluate on all batches:
 ```
