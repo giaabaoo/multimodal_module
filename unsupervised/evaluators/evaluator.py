@@ -2,7 +2,8 @@ import os
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, precision_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, \
+f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, precision_score, balanced_accuracy_score
 import numpy as np
 from tqdm import tqdm
 from pathlib import Path
@@ -30,6 +31,7 @@ class BaseEvaluator:
         # Finding the optimal llr scores for highest F1-score
         self.draw_llr_scores(scores)
         best_llr_threshold, optimal_predicted_labels = self.find_optimal_llr_threshold(gt_labels, scores)
+        # optimal_predicted_labels = predicted_labels
         self.draw_confusion_matrix(gt_labels, optimal_predicted_labels)
         self.print_metrics(gt_labels, optimal_predicted_labels, best_llr_threshold)
 
