@@ -1,2 +1,2 @@
 cd ../../
-python inference.py
+python inference.py --config ./configs/minieval.yaml

@@ -1,3 +1,3 @@
 # run separate batch on separate machine
 cd ../../
-python inference.py --batch_idx 4
+python inference.py --batch_idx 3 --config ./configs/minieval.yaml

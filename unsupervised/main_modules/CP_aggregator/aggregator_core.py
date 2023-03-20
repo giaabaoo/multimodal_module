@@ -25,7 +25,7 @@ class SimpleAggregator():
                 + binary_matrix: np array representing for index-based change point result
         '''
 
-        # print("=============Aggregating to find final impactful change point================")
+        print("=============Aggregating to find final impactful change point================")
         # accumulated list
         h = [0]*(len(segment_ids))
         score = [0]*(len(segment_ids))

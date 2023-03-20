@@ -7,6 +7,8 @@ from hsemotion.facial_emotions import HSEmotionRecognizer
 from dotmap import DotMap
 import os 
 from main_modules.ES_extractor.ES_visual.visual_feat import VisualES
+from main_modules.ES_extractor.ES_audio.audio_feat import AudioES
+
 import argparse
 from pathlib import Path
 import os
@@ -23,13 +25,10 @@ def get_args_parser():
     return parser
 
 def get_batch_df(config):
-    if config.network.use_audio_features:
-        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/output/batches_audio"
-    else:
-        folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/output/batches"
+    folder_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/" + config.pipeline.output_path
     output_path = os.path.join(folder_path, f"batch_{config.batch_idx}")
     Path(output_path).mkdir(parents=True, exist_ok=True)
-    csv_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/data/batches"
+    csv_path = "/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/" + config.dataset.input_path
     df = pd.read_csv(os.path.join(csv_path, f"batch_{config.batch_idx}.csv"))
     
     return df, output_path
@@ -48,6 +47,7 @@ def prepare_configs(args):
     else:
         df = pd.read_csv(config.dataset.input_path)
         output_path = config.pipeline.output_path
+        
     config.df = df
     config.output_path = output_path
     Path(output_path).mkdir(parents=True, exist_ok=True)
@@ -64,9 +64,7 @@ def prepare_architectures(config):
     ES_extractor.initialize_model(face_detector, emotion_recognizer)
     
     ##### Audio ES Extractor #####
-    
     AudioES_extractor = AudioES(config)
-    AudioES_extractor.initialize_model()
     
     return ES_extractor, AudioES_extractor
 

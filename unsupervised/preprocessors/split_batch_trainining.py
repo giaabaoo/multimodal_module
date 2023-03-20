@@ -1,15 +1,22 @@
 import pandas as pd
 import math
 from pathlib import Path
+import argparse
+from utils import get_args_parser
 import pdb
 
 if __name__ == "__main__":
-    Path("data/batches").mkdir(parents=True, exist_ok=True)
+    ##### Defining arguments #####
+    parser = argparse.ArgumentParser(
+        "UCP detection inference on multi-modal data", parents=[get_args_parser()])
+    args = parser.parse_args()
+    
+    Path(args.batches_data_csv).mkdir(parents=True, exist_ok=True)
     # Load the segments into a Pandas DataFrame
     try:
-        segments = pd.read_csv('data/full_data.csv')
+        segments = pd.read_csv(args.full_data_csv)
     except:
-        print("full_data.csv might not exist. Generate it using prepare_full_data_UCP.py first.")
+        print("mini_eval_data.csv might not exist. Generate it using prepare_full_data_mini_eval.py first.")
 
     # Define the number of segments per batch
     segments_per_batch = 1000
@@ -22,4 +29,4 @@ if __name__ == "__main__":
 
     # Save each batch to a separate CSV file
     for i, batch in enumerate(batches):
-        batch.to_csv(f'data/batches/batch_{i+1}.csv', index=False)
+        batch.to_csv(f'{args.batches_data_csv}/batch_{i+1}.csv', index=False)

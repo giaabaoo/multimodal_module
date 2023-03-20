@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, precision_score
 import numpy as np
 from tqdm import tqdm
 from pathlib import Path
@@ -38,7 +38,7 @@ class BaseEvaluator:
         predicted_labels = []
         scores = []
 
-        for batch_idx in range(1, len(os.listdir(self.prediction_path))+1):
+        for batch_idx in range(1, len([f for f in os.listdir(self.prediction_path) if f != "figures"])+1):
             # Define the directory containing the JSON files
             prediction_dir = os.path.join(self.prediction_path, f'batch_{batch_idx}')
             
@@ -167,7 +167,7 @@ class BaseEvaluator:
     
     def find_optimal_llr_threshold(self, gt_labels, scores): # find best threshold regarding f1
         # Create empty lists for storing evaluation metrics
-        f1_list = []
+        macro_avg_precision_list = []
         print("Finding the optimal llr threshold.....")
         predicted_labels_list = []
         # Loop through different threshold values and calculate evaluation metrics
@@ -176,15 +176,15 @@ class BaseEvaluator:
             predicted_labels = [1 if llr >= threshold else 0 for llr in scores]
 
             # Calculate precision, recall, and F1 score
-            f1 = f1_score(gt_labels, predicted_labels)
+            macro_avg_precision = precision_score(gt_labels, predicted_labels, average='macro')
             
             # Add the evaluation metrics to their respective lists
-            f1_list.append(f1)
+            macro_avg_precision_list.append(macro_avg_precision)
             predicted_labels_list.append(predicted_labels)
         
 
         # Find the threshold that maximizes the F1 score
-        best_threshold_index = np.argmax(f1_list)
+        best_threshold_index = np.argmax(macro_avg_precision_list)
         best_threshold = scores[best_threshold_index]
         print(f"---> Best LLR threshold: {best_threshold:.4f} (chosen from llr_scores.png)")       
         

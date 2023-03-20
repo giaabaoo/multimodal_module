@@ -11,12 +11,27 @@ from pydub import AudioSegment
 from torch.autograd import Variable
 from tqdm import tqdm
 import yaml
-from audio_head import get_audio_model, get_trill_model
-from utils.consts import DEVICE, SEGMENT_STRIDE, SEGMENT_DURATION, REQUIRED_SAMPLE_RATE
-from utils.label_space_mapping import bold_to_main, bold_to_main_valence, bold_to_main_arousal
+from .audio_head import get_audio_model, get_trill_model
+from .consts import DEVICE, SEGMENT_STRIDE, SEGMENT_DURATION, REQUIRED_SAMPLE_RATE
+from .label_space_mapping import bold_to_main, bold_to_main_valence, bold_to_main_arousal
+
+emotions_mapping = {
+    "emotion0": "fear",
+    "emotion1": "anger",
+    "emotion2": "joy",
+    "emotion3": "sadness",
+    "emotion4": "disgust",
+    "emotion5": "surprise",
+    "emotion6": "trust",
+    "emotion7": "anticipation",
+    # "emotion8": "# none",
+}
 
 class AudioES():
     def __init__(self, config):
+        self.config = config
+    
+    def update_args(self, config):
         self.config = config
         
     def get_emotion_features_from_audio(self, audio_model, audio_segment, original_sample_rate):
@@ -169,68 +184,62 @@ class AudioES():
             print(f"[Audio Head] Process {Path(file_path).parent.name}")
 
         return results, audio_embedding, audio_feature, raw_audio, orig_sampling_rate, clip.duration_seconds
+    def extract_audio_features(self, audio_path):
+        audio_out = self.process_audio_file(audio_path, "")
+        audio_results, audio_embedding, audio_features, raw_audio, audio_sampling_rate, audio_duration = audio_out
+        print(f"Audio duration: {audio_duration}")
+        if audio_results is not None:
+            duration = np.maximum(audio_duration, self.config.video_duration)  # video duration should be > audio
 
-emotions_mapping = {
-    "emotion0": "fear",
-    "emotion1": "anger",
-    "emotion2": "joy",
-    "emotion3": "sadness",
-    "emotion4": "disgust",
-    "emotion5": "surprise",
-    "emotion6": "trust",
-    "emotion7": "anticipation",
-    "emotion8": "# none",
-}
-def process_audio_emotions(results, raw_features, n_timesteps=15):
-    emotions_cols = [x for x in emotions_mapping.keys()] + ["valence", "arousal"]
+            print(f"Audio results: {audio_results.shape}")
+            print(f"Audio embedding: {audio_embedding.shape}")
+            print(f"Audio features: {audio_features.shape}")
+            print(f"Audio raw: {raw_audio.shape}")
+            print(f"Audio sampling rate: {audio_sampling_rate}")
+            audio_emo_pred, audio_emo_feat = self.process_audio_emotions(
+                audio_results, audio_embedding,
+                n_timesteps=int(np.round(duration))
+            )
+            print(f"Audio emotion predictions: {audio_emo_pred.shape}")
+            print(f"Audio emotion features: {audio_emo_feat.shape}")
+            print(f"Audio emotion predictions: {audio_emo_pred.shape}")
+        
+        return audio_emo_pred, audio_emo_feat
 
-    n_channels = raw_features.shape[1]
-    feature_dim = raw_features.shape[2]
+    def process_audio_emotions(self, results, raw_features, n_timesteps=15):
+        # emotions_cols = [x for x in emotions_mapping.keys()] + ["valence", "arousal"]
+        emotions_cols = [x for x in emotions_mapping.keys()] 
 
-    # n_timesteps = np.floor(results["end"].max()).astype(int)
-    n_emotions = len(emotions_cols)
+        n_channels = raw_features.shape[1]
+        feature_dim = raw_features.shape[2]
 
-    predictions = np.zeros((n_timesteps, n_emotions))
-    features = np.zeros((n_timesteps, n_channels, feature_dim))
-    for i in range(len(results)):
-        data = results.loc[i, emotions_cols].values
-        start = np.ceil(results["start"][i]).astype(int)
-        end = np.ceil(results["end"][i]).astype(int)
-        if end > n_timesteps:
-            break
-        predictions[start:end, :] = data
+        # n_timesteps = np.floor(results["end"].max()).astype(int)
+        n_emotions = len(emotions_cols)
 
-        features[start:end, :, :] = raw_features[i]
+        predictions = np.zeros((n_timesteps, n_emotions))
+        features = np.zeros((n_timesteps, n_channels, feature_dim))
+        for i in range(len(results)):
+            data = results.loc[i, emotions_cols].values
+            start = np.ceil(results["start"][i]).astype(int)
+            end = np.ceil(results["end"][i]).astype(int)
+            if end > n_timesteps:
+                break
+            predictions[start:end, :] = data
 
-    return predictions, features
+            features[start:end, :, :] = raw_features[i]
+
+        return predictions, features
 
 if __name__ == "__main__":
     with open("/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/configs/audio_features.yaml", 'r') as f:
         config_dict = yaml.safe_load(f)
     print(config_dict)
     config = DotMap(config_dict)
+    config.video_duration = 170
     
     AudioES_extractor = AudioES(config)
     
-    video_duration = 15
-    
     audio_path = "/home/dhgbao/Research_Monash/dataset/ccu-data/CCU_COMBINED_ANNOTATED_VIDEO/segmented_videos_audio/M01000AJ7_0001.mp3"
     # extract ES signals, all emotion category tracks, and all start-end offset tracks
-    audio_out = AudioES_extractor.process_audio_file(audio_path, "")
-    audio_results, audio_embedding, audio_features, raw_audio, audio_sampling_rate, audio_duration = audio_out
-    print(f"Audio duration: {audio_duration}")
-    if audio_results is not None:
-        duration = np.maximum(audio_duration, video_duration)  # video duration should be > audio
-
-        print(f"Audio results: {audio_results.shape}")
-        print(f"Audio embedding: {audio_embedding.shape}")
-        print(f"Audio features: {audio_features.shape}")
-        print(f"Audio raw: {raw_audio.shape}")
-        print(f"Audio sampling rate: {audio_sampling_rate}")
-        audio_emo_pred, audio_emo_feat = process_audio_emotions(
-            audio_results, audio_embedding,
-            n_timesteps=int(np.round(duration))
-        )
-        print(f"Audio emotion predictions: {audio_emo_pred.shape}")
-        print(f"Audio emotion features: {audio_emo_feat.shape}")
-        print(f"Audio emotion predictions: {audio_emo_pred.shape}")
+    audio_emo_pred, audio_emo_feat = AudioES_extractor.extract_audio_features(audio_path)
+    

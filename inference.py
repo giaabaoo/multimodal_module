@@ -15,6 +15,7 @@ def inference(config, ES_extractor, AudioES_extractor):
         config.end_second = row['end_second']
         config.video_name = row['segment_id']
         config.single_video_path = video_path
+        config.single_audio_path = row['audio_path']
         config.single_output_path = os.path.join(config.output_path, video_path.split("/")[-1].replace(".mp4",".json"))
         print(f"Video: {config.video_name}")
         print(f'Video path: {config.single_video_path} \n JSON path: {config.single_output_path} \n')

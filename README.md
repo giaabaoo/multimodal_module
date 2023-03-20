@@ -25,10 +25,10 @@ Get UCP timestamp-scores given a segment (path: scripts/exps) with shape (number
 sh get_UCP_scores.sh
 ```
 
-### Data preparation
+### Data preparation (Currently testing on minieval data)
 Prepare csv file containing changepoint and non-changepoint segments:
 ```
-sh prepare_full_data.sh
+sh prepare_minieval_data.sh
 ```
 
 For faster inference, it is recommended to split the full data into batches (default 1000 segments per batch) and run them in parallel:

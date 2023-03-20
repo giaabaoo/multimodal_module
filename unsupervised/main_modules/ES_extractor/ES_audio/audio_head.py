@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from utils.consts import DEVICE, AUDIO_MODEL_PATH
+from .consts import DEVICE, AUDIO_MODEL_PATH
 
 
 class AudioDnn(nn.Module):

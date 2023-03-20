@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from main_modules.CP_aggregator.segment_core import UniformSegmentator
 from main_modules.CP_aggregator.aggregator_core import SimpleAggregator
-from main_modules.ES_extractor.ES_audio.audio_feat import get_audio_features
+
 from main_modules.UCP.inference_ucp import detect_CP_tracks
 from utils import draw_result_graph
 import pdb
@@ -140,30 +140,25 @@ def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
     config.fps = video_fps
     config.video_num_frames = video_num_frames
 
-    # update configuration of ES extractor with new video information
-    ES_extractor.update_args(config)
-
-    # extract ES signals, all emotion category tracks, and all start-end offset tracks
-    es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
+    es_signals = []
+    all_start_end_offset_track = []
+    if config.network.use_visual_features:
+        # update configuration of ES extractor with new video information
+        ES_extractor.update_args(config)
+        # extract ES signals, all emotion category tracks, and all start-end offset tracks
+        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
     
-    pdb.set_trace()
+    # pdb.set_trace()
     if config.network.use_audio_features:
-        audio_path = config.single_video_path.replace("all_videos","segmented_videos_audio") ### should add audio path to df later
-        audio_out = AudioES_extractor.process_audio_file(audio_path, "")
-        audio_results, audio_embedding, audio_features, raw_audio, audio_sampling_rate, audio_duration = audio_out
-        if audio_results is not None:
-            audio_emo_pred, audio_emo_feat = process_audio_emotions(
-                    audio_results, audio_embedding,
-                    n_timesteps=int(np.round(duration=15))
-                )
-        print(f"Audio duration: {audio_duration}")
+        audio_path = config.single_audio_path
+        config.video_duration = video_num_frames
+        AudioES_extractor.update_args(config)
+        audio_emo_pred, audio_emo_feat = AudioES_extractor.extract_audio_features(audio_path)
         
         ### find a way to append to es signals frames by frames
-        es_signals += audio_signals
-        all_start_end_offset_track += audio_start_end_offset_track
+        es_signals.append(audio_emo_pred)
+        all_start_end_offset_track.append([0, video_num_frames-1])
         
-    # pdb.set_trace()
-    # pdb.set_trace()
     # initialize flags for no CP detected
     no_cp_confirm1 = False
     no_cp_confirm2 = False
@@ -185,6 +180,7 @@ def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
         if len(all_peaks_track) == 0:
             no_cp_confirm2 = True
 
+    # pdb.set_trace()
     # if there are no CPs detected, skip post-processing and aggregation
     if no_cp_confirm1 is False and no_cp_confirm2 is False:
         # create Softmax object for post-processing
@@ -218,7 +214,6 @@ def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
                 except:
                     continue
                 score_cp_matrix[idx_track][each_cp_index] = all_scores_pick_softmax_track[idx_track][i]
-        
         
         # Video Segmentator
         # Create a uniform segmentator to divide the video into equal-sized segments.
