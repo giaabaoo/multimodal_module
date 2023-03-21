@@ -11,7 +11,7 @@ from main_modules.UCP.inference_ucp import detect_CP_tracks
 from utils import draw_result_graph
 import pdb
 
-def get_unsupervised_scores(config, ES_extractor):
+def get_unsupervised_scores(config, ES_extractor, AudioES_extractor):
     # load video file
     video = VideoFileClip(config.single_video_path)
 
@@ -30,17 +30,25 @@ def get_unsupervised_scores(config, ES_extractor):
     config.video_duration = video_duration
     config.fps = video_fps
     config.video_num_frames = video_num_frames
-
-    # update configuration of ES extractor with new video information
-    ES_extractor.update_args(config)
-
-    # extract ES signals, all emotion category tracks, and all start-end offset tracks
-    es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
     
+    es_signals = []
+    all_start_end_offset_track = []
+    if config.network.use_visual_features:
+        # update configuration of ES extractor with new video information
+        ES_extractor.update_args(config)
+        # extract ES signals, all emotion category tracks, and all start-end offset tracks
+        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
+    
+    # pdb.set_trace()
     if config.network.use_audio_features:
-        audio_signals, audio_start_end_offset_track = get_audio_features(video)
-        es_signals += audio_signals
-        all_start_end_offset_track += audio_start_end_offset_track
+        audio_path = config.single_audio_path
+        config.video_duration = video_num_frames
+        AudioES_extractor.update_args(config)
+        audio_emo_pred, audio_emo_feat = AudioES_extractor.extract_audio_features(audio_path)
+        
+        ### find a way to append to es signals frames by frames
+        es_signals.append(audio_emo_pred)
+        all_start_end_offset_track.append([0, video_num_frames-1])
         
     # initialize flags for no CP detected
     no_cp_confirm1 = False
