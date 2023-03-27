@@ -34,6 +34,11 @@ python full_extract_audio_tone.py
   <img src="output/mfcc.png" width="400">
 </figure>
 
+<figure>
+    <figcaption>Expected output using zero_crossing_rate features</figcaption>
+  <img src="output/zero_crossing_rate.png" width="400">
+</figure>
+
 Visualize the types of features (audio emotional features/tone features)
 ```
 sh visualize_features.sh
