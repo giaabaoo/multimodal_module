@@ -35,6 +35,12 @@ Visualize the types of features (audio emotional features/tone features)
 ```
 sh visualize_features.sh
 ```
-![Expected output for CP segment](output/M01003ME4_0012.png)
-![Expected output for non-CP segment](output/M01003JSD_0015.png)
+<figure>
+    <figcaption>Expected output for CP segment</figcaption>
+  <img src="output/M01003ME4_0012.png" width="400">
+</figure>
 
+<figure>
+    <figcaption>Expected output for non-CP segment</figcaption>
+  <img src="output/M01003JSD_0015.png" width="400">
+</figure>
