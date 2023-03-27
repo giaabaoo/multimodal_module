@@ -5,7 +5,7 @@ checkpoints/
 */__pycache__
 *.pyc
 
-*.png
+# *.png
 *.mp4
 *.npy
 *.json
