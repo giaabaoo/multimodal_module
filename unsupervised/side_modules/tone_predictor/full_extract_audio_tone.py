@@ -16,7 +16,7 @@ if __name__ == "__main__":
     noncp_tone_features = []
 
     # Iterate over rows in data
-    for index, row in tqdm(data.head(10).iterrows(), total=len(data)):
+    for index, row in tqdm(data.head(100).iterrows(), total=len(data)):
         audio_file = row['audio_path']
 
         try:
@@ -34,8 +34,11 @@ if __name__ == "__main__":
         # Compute tone features for each segment
         tone_features = []
         for segment in audio_segments:
-            tonnetz = librosa.feature.tonnetz(y=segment, sr=sr)
-            tone_features.append(tonnetz.T)
+            # chroma = librosa.feature.chroma_stft(y=segment, sr=sr)
+            # mfcc = librosa.feature.mfcc(y=segment, sr=sr)
+            spectral_contrast = librosa.feature.spectral_contrast(y=segment, sr=sr)
+            # tonnetz = librosa.feature.tonnetz(y=segment, sr=sr)
+            tone_features.append(spectral_contrast.T)
 
         # Convert list of tone feature arrays to a single numpy array
         try:
