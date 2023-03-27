@@ -10,14 +10,28 @@ Bar plot for a sampled balanced set of audio segments regarding the tone feature
 ```
 python full_extract_audio_tone.py
 ```
-![Expected output using tonnetz features](tonnetz.png)
-![Expected output using chroma features](output/chroma.png)
-![Expected output using spectral_contrast features](output/spectral_contrast.png)
-![Expected output using mfcc features](output/mfcc.png)
 
+<figure>
+  <img src="output/tonnetz.png" width="400">
+  <figcaption>Expected output using tonnetz features</figcaption>
+</figure>
+
+<figure>
+  <img src="output/chroma.png" width="400">
+  <figcaption>Expected output using chroma features</figcaption>
+</figure>
+
+<figure>
+  <img src="output/spectral_contrast.png" width="400">
+  <figcaption>Expected output using spectral_contrast features</figcaption>
+</figure>
+
+<figure>
+  <img src="output/mfcc.png" width="400">
+  <figcaption>Expected output using mfcc features</figcaption>
+</figure>
 
 Visualize the types of features (audio emotional features/tone features)
-
 ```
 sh visualize_features.sh
 ```
