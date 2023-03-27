@@ -10,6 +10,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # Define the folder path containing the segmented video files
     video_folder = args.video_folder
+    audio_folder = args.audio_folder
     Path("data").mkdir(parents=True, exist_ok=True)
     
     # Define the path to the original changepoints_preprocessed.csv file
@@ -37,8 +38,10 @@ if __name__ == '__main__':
     segment_path_df = pd.DataFrame({
         'segment_id': merged_df['segment_id'],
         'file_path': merged_df['segment_id'].apply(lambda x: os.path.join(video_folder, x + '.mp4')),
+        'audio_path': merged_df['segment_id'].apply(lambda x: os.path.join(audio_folder, x + '.mp3')),
         'start_second': merged_df['start_second'],
-        'end_second': merged_df['end_second']
+        'end_second': merged_df['end_second'],
+        'CP_second' : merged_df['timestamp']
     })
     segment_path_df['label'] = 1
 

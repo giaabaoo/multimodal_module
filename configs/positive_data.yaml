@@ -16,6 +16,9 @@ network:
   len_face_tracks: 30
   num_intervals: 2
   max_cp_found: 1
+  use_audio_features: True
+  use_visual_features: True
   # min_seconds_per_segment: 200
   min_face_size: 40
-  # visualize_debug_face_track: True
+  max_idx_frame_debug: null
+  visualize_debug_face_track: True

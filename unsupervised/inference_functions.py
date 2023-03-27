@@ -39,6 +39,7 @@ def get_unsupervised_scores(config, ES_extractor, AudioES_extractor):
         # extract ES signals, all emotion category tracks, and all start-end offset tracks
         es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
     
+    
     # pdb.set_trace()
     if config.network.use_audio_features:
         audio_path = config.single_audio_path
@@ -120,7 +121,10 @@ def get_unsupervised_scores(config, ES_extractor, AudioES_extractor):
             
         ### Debug converting frame-level scores into timestamp-level
         draw_result_graph(config, score_cp_matrix, score_cp_matrix_ts)
-    return score_cp_matrix_ts, binary_cp_matrix_ts
+        
+        return score_cp_matrix_ts, binary_cp_matrix_ts
+
+    return [], []
 
 def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
     # load video file

@@ -6,12 +6,13 @@ import cv2
 import pdb
 import bbox_visualizer as bbv
 import torch
-
+from deepsort.tracker import DeepSortTracker
 from facenet_pytorch import MTCNN
 from hsemotion.facial_emotions import HSEmotionRecognizer
 from dotmap import DotMap
 from moviepy.editor import *
 from tqdm import tqdm
+from pathlib import Path
 
 def cal_iou(bbox1, bbox2):
     """
@@ -129,6 +130,7 @@ class VisualES():
         # clip = VideoFileClip(video_path)
         print("===========Finding face tracks==============")
         frame_count = int(clip.fps * clip.duration)
+        # pdb.set_trace()
         width = int(clip.w)
         height = int(clip.h)
         frames_list = list(clip.iter_frames())
@@ -144,11 +146,33 @@ class VisualES():
         all_start_end_offset_track = []
 
         # FOR VISUALIZING ONLY
-        if self.args.visualize_debug_face_track == True:
-            # pdb.set_trace()
+        if self.args.network.visualize_debug_face_track == True:
             fourcc = cv2.VideoWriter_fourcc(*'MPEG')
-            output = cv2.VideoWriter(os.path.join('./test_debug_output', 'out_test_vid.mp4'), fourcc, 5.0, (width, height))
+            output_folder = '/home/dhgbao/Research_Monash/code/my_code/unsupervised_approach/multimodal_module/output/test_debug_output'
+            Path(output_folder).mkdir(parents=True, exist_ok=True)
+            output = cv2.VideoWriter(os.path.join(output_folder, f'{self.args.video_name}.mp4'), fourcc, clip.fps, (width, height), True)
 
+        # Create a new DeepSortTracker object
+        # tracker = DeepSortTracker() 
+        # for idx, frame in tqdm(enumerate(frames_list), total=len(frames_list)):
+        #     idx_frame += 1
+    
+        #     # detect faces
+        #     bounding_boxes, probs = self.face_detector.detect(frame, landmarks=False)
+        #     # Track the objects using DeepSORT
+        #     pdb.set_trace()
+        #     track_bboxes = tracker.update(bounding_boxes)
+            
+        #     # Draw the tracked objects on the frame
+        #     for bbox in track_bboxes:
+        #         xmin, ymin, xmax, ymax, track_id = map(int, bbox)
+        #         cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+        #         cv2.putText(frame, str(track_id), (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+        #     # Write the frame to the output video
+        #     output.write(frame)
+        
+        
         for idx, frame in tqdm(enumerate(frames_list), total=len(frames_list)):
         # for idx, frame in enumerate(frames_list):
             # skip frame
@@ -169,8 +193,6 @@ class VisualES():
 
             if bounding_boxes is None:
                 continue
-            
-            
 
             # Stage 1: Process dying tracks
             for idx, each_active_tracks in enumerate(all_tracks):
@@ -181,7 +203,6 @@ class VisualES():
                     mark_old_track_idx.append(idx)
 
             # Stage 2: Assign new boxes to remaining active tracks or create a new track if there are active tracks
-
             for idx, bbox in enumerate(bounding_boxes):
                 box = bbox.astype(int)
                 # x1, y1, x2, y2 = box[0:4]   
@@ -203,6 +224,7 @@ class VisualES():
                 except:
                     continue # BAO
                 # softmax as feature
+                
                 scores = softmax(torch.Tensor(np.array([scores])))
                 es_feature = scores[0].tolist() ### this is what we need
                 emotion_cat = emotion ### this is what we need
@@ -234,14 +256,18 @@ class VisualES():
                     # also create new np array representing for new track here
                     new_es_array_track = np.array([es_feature])
                     new_start_end_offset_track = [idx_frame, idx_frame] #[start, end]
+                    new_ec_array_track = np.array([emotion_cat])
 
+                    all_emotion_category_tracks.append(new_ec_array_track)
                     all_es_feat_tracks.append(new_es_array_track)
                     all_start_end_offset_track.append(new_start_end_offset_track)
 
 
                     # FOR VISUALIZING ONLY
-                    if self.args.visualize_debug_face_track == True:
+                    if self.args.network.visualize_debug_face_track == True:
                         draw_face_track_bbox.append([box, new_track["id"]])
+                    
+                    # pdb.set_trace()
                 else:
                     # update track
                     all_tracks[best_match_track_id]['bbox'].append(box)
@@ -261,18 +287,18 @@ class VisualES():
                     all_es_feat_tracks[best_match_track_id] = np.append(all_es_feat_tracks[best_match_track_id], [es_feature], axis=0) # add more feature for this track
                     all_start_end_offset_track[best_match_track_id][-1] = idx_frame # change index frame
 
-                    if self.args.visualize_debug_face_track == True:
+                    if self.args.network.visualize_debug_face_track == True:
                     # FOR VISUALIZING ONLY
                         draw_face_track_bbox.append([box, all_tracks[best_match_track_id]['id']])
                 
 
             # FOR VISUALIZING ONLY, draw all face track box
-            if self.args.visualize_debug_face_track == True:
+            if self.args.network.visualize_debug_face_track == True:
                 all_box = [l[0] for l in draw_face_track_bbox]
                 all_id = ["ID:"+str(a[1]) for a in draw_face_track_bbox]
 
-                # frame = bbv.draw_multiple_rectangles(frame, all_box)
-                # frame = bbv.add_multiple_labels(frame, all_id, all_box)
+                frame = bbv.draw_multiple_rectangles(frame, all_box)
+                frame = bbv.add_multiple_labels(frame, all_id, all_box)
                 
                 output.write(frame)
 
@@ -280,20 +306,23 @@ class VisualES():
                 if idx_frame >= self.args.network.max_idx_frame_debug:
                     break
 
-        if self.args.visualize_debug_face_track == True:
+        if self.args.network.visualize_debug_face_track == True:
+            # pdb.set_trace()
             output.release()
 
         # filter again es signals, ignoring those tracks having length lesser than pre-defined numbers
         all_es_feat_tracks_filter = []
         all_start_end_offset_track_filter = []
+        all_emotion_category_tracks_filter = []
 
-        for es_feat_track, se_track in zip(all_es_feat_tracks, all_start_end_offset_track):
+        for es_feat_track, se_track, ec_track in zip(all_es_feat_tracks, all_start_end_offset_track, all_emotion_category_tracks):
             length = es_feat_track.shape[0]
             if length >= self.args.network.len_face_tracks:
                 all_es_feat_tracks_filter.append(es_feat_track)
                 all_start_end_offset_track_filter.append(se_track)
+                all_emotion_category_tracks_filter.append(ec_track)
 
-        return all_es_feat_tracks_filter, None, all_start_end_offset_track_filter
+        return all_es_feat_tracks_filter, all_emotion_category_tracks_filter, all_start_end_offset_track_filter
 
             
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ network:
   max_cp_found: 1
   min_face_size: 50
   use_audio_features: True
+  use_visual_features: True
   # min_seconds_per_segment: 200
   # min_frame_per_second: 3 # skip frame info.
   # visualize_debug_face_track: True

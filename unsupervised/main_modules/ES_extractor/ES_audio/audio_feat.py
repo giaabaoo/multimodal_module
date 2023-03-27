@@ -2,6 +2,8 @@
 import numpy as np
 import torch
 from pathlib import Path
+import pdb
+import os
 from collections import OrderedDict
 import librosa
 import numpy as np
@@ -24,7 +26,7 @@ emotions_mapping = {
     "emotion5": "surprise",
     "emotion6": "trust",
     "emotion7": "anticipation",
-    # "emotion8": "# none",
+    "emotion8": "# none",
 }
 
 class AudioES():
@@ -88,8 +90,22 @@ class AudioES():
         # l19 = torch.unsqueeze(l19, 0)
         return feat, l19
 
-    def process_audio_file(self, file_path: str, result_path: str, stride=None):
+    def process_audio_file(self, file_path: str, result_path: str, expand_segments: bool, stride=None):
+        # if expand_segments:
+        #     segment_number = int(file_path.split("/")[-1].replace(".mp3","").split("_")[-1])
+        #     prev_segment_file_name = file_path.split("/")[-1].replace(".mp3","").split("_")[0] + "_" + str(segment_number+1).zfill(4)
+        #     prev_segment_file_path = os.path.join("/".join(file_path.split("/")[:-1]), prev_segment_file_name) + ".mp3"
+        #     prev_clip = AudioSegment.from_file(prev_segment_file_path)
+            
+        #     latter_segment_file_name = file_path.split("/")[-1].replace(".mp3","").split("_")[0] + "_" + str(segment_number-1).zfill(4)
+        #     latter_segment_file_path = os.path.join("/".join(file_path.split("/")[:-1]), latter_segment_file_name) + ".mp3"
+        #     latter_clip = AudioSegment.from_file(latter_segment_file_path)
+            
+        #     current_clip = AudioSegment.from_file(file_path)
+        #     clip = prev_clip + current_clip + latter_clip
+        # else:
         clip = AudioSegment.from_file(file_path)
+        
         orig_sampling_rate = clip.frame_rate
 
         data = OrderedDict()
@@ -184,8 +200,8 @@ class AudioES():
             print(f"[Audio Head] Process {Path(file_path).parent.name}")
 
         return results, audio_embedding, audio_feature, raw_audio, orig_sampling_rate, clip.duration_seconds
-    def extract_audio_features(self, audio_path):
-        audio_out = self.process_audio_file(audio_path, "")
+    def extract_audio_features(self, audio_path, expand_segments):
+        audio_out = self.process_audio_file(audio_path, "", expand_segments)
         audio_results, audio_embedding, audio_features, raw_audio, audio_sampling_rate, audio_duration = audio_out
         print(f"Audio duration: {audio_duration}")
         if audio_results is not None:
@@ -206,9 +222,9 @@ class AudioES():
         
         return audio_emo_pred, audio_emo_feat
 
-    def process_audio_emotions(self, results, raw_features, n_timesteps=15):
-        # emotions_cols = [x for x in emotions_mapping.keys()] + ["valence", "arousal"]
-        emotions_cols = [x for x in emotions_mapping.keys()] 
+    def process_audio_emotions(self, results, raw_features, n_timesteps):
+        emotions_cols = [x for x in emotions_mapping.keys()] + ["valence", "arousal"]
+        # emotions_cols = [x for x in emotions_mapping.keys()] 
 
         n_channels = raw_features.shape[1]
         feature_dim = raw_features.shape[2]
@@ -225,7 +241,6 @@ class AudioES():
             if end > n_timesteps:
                 break
             predictions[start:end, :] = data
-
             features[start:end, :, :] = raw_features[i]
 
         return predictions, features
