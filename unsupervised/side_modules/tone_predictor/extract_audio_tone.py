@@ -40,4 +40,4 @@ if __name__ == "__main__":
     plt.xlabel('Time (s)')
     plt.ylabel('Value')
     plt.legend()
-    plt.savefig("tone_plot.png")
+    plt.savefig("output/tone_plot.png")

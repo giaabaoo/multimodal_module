@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
-import pdb
 
 if __name__ == "__main__":
     # Load data from balanced_data.csv
@@ -17,7 +16,7 @@ if __name__ == "__main__":
     noncp_tone_features = []
 
     # Iterate over rows in data
-    for index, row in tqdm(data.head(50).iterrows(), total=len(data)):
+    for index, row in tqdm(data.head(10).iterrows(), total=len(data)):
         audio_file = row['audio_path']
 
         try:
@@ -35,17 +34,9 @@ if __name__ == "__main__":
         # Compute tone features for each segment
         tone_features = []
         for segment in audio_segments:
-            # chroma = librosa.feature.chroma_stft(y=segment, sr=sr)
-            # mfcc = librosa.feature.mfcc(y=segment, sr=sr)
-            # spectral_contrast = librosa.feature.spectral_contrast(y=segment, sr=sr)
             tonnetz = librosa.feature.tonnetz(y=segment, sr=sr)
-            # Add spectral flux and zero-crossing rate features
-            # spectral_flux = librosa.onset.onset_strength(y=segment, sr=sr)
-            # zero_crossing_rate = librosa.feature.zero_crossing_rate(y=segment)
-            # pitch = librosa.yin(segment, 50, 300, sr=sr) / 100
             tone_features.append(tonnetz.T)
 
-        
         # Convert list of tone feature arrays to a single numpy array
         try:
             tone_features = np.vstack(tone_features)
@@ -71,29 +62,27 @@ if __name__ == "__main__":
     # Create figure with 2 subplots
     fig, axs = plt.subplots(2, figsize=(10, 8))
 
+    # Adjust vertical spacing between subplots
+    fig.subplots_adjust(hspace=0.5)
+
     # Plot CP tone feature bar chart
-    cp_mean = np.mean(cp_tone_features, axis=0)
-    cp_median = np.median(cp_tone_features, axis=0)
-    x = np.arange(len(cp_mean))
+    x = np.arange(cp_tone_features.shape[1])
     width = 0.35
-    axs[0].bar(x - width/2, cp_mean, width, label='Mean')
-    axs[0].bar(x + width/2, cp_median, width, label='Median')
+    axs[0].bar(x, np.mean(cp_tone_features, axis=0), width, label='CP')
     axs[0].set_xticks(x)
-    # axs[0].set_xticklabels(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
     axs[0].set_xlabel('Pitch Class')
     axs[0].set_ylabel('Value')
     axs[0].set_title('Tone Features for CP')
     axs[0].legend()
 
     # Plot non-CP tone feature bar chart
-    noncp_mean = np.mean(noncp_tone_features, axis=0)
-    noncp_median = np.median(noncp_tone_features, axis=0)
-    axs[1].bar(x - width/2, noncp_mean, width, label='Mean')
-    axs[1].bar(x + width/2, noncp_median, width, label='Median')
+    x = np.arange(noncp_tone_features.shape[1])
+    width = 0.35
+    axs[1].bar(x, np.mean(noncp_tone_features, axis=0), width, label='Non-CP')
     axs[1].set_xticks(x)
-    # axs[0].set_xticklabels(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'])
-    axs[1].set_title('Non-CP Tone Features')
-    axs[1].set_xlabel('Tone Feature')
+    axs[1].set_xlabel('Pitch Class')
     axs[1].set_ylabel('Value')
+    axs[1].set_title('Tone Features for Non-CP')
     axs[1].legend()
-    plt.savefig('cp_noncp_tone_plot.png')
+
+    plt.savefig("output/balanced_data_tone_plot.png")
