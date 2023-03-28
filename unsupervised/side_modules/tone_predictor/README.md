@@ -9,10 +9,20 @@ python extract_audio_tone.py
   <img src="output/tone_plot.png" width="400">
 </figure>
 
-Bar plot for a sampled balanced set of audio segments regarding the tone features
+Boxplots for a sampled balanced set of audio segments regarding the acoustic features
 ```
 python full_extract_audio_tone.py
 ```
+
+<figure>
+  <figcaption>Expected output using spectral_rolloff features</figcaption>
+  <img src="output/spectral_rolloff.png" width="400">
+</figure>
+
+<figure>
+  <figcaption>Expected output using spectral_centroid features</figcaption>
+  <img src="output/spectral_centroid.png" width="400">
+</figure>
 
 <figure>
   <figcaption>Expected output using tonnetz features</figcaption>
@@ -39,7 +49,13 @@ python full_extract_audio_tone.py
   <img src="output/zero_crossing_rate.png" width="400">
 </figure>
 
-Visualize the types of features (audio emotional features/tone features) per timestamp-level
+
+For loudness/pitch extraction, use:
+```
+python full_extract_audio_tone_v2.py
+```
+
+Visualize the types of features (audio emotional features/tone features) per timestamp-level:
 ```
 sh visualize_features.sh
 ```
