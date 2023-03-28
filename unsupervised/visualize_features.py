@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 import librosa
 from dotmap import DotMap
-from main_modules.ES_extractor.ES_audio.audio_feat import AudioES
+# from main_modules.ES_extractor.ES_audio.audio_feat import AudioES
 import numpy as np
 from utils import get_args_parser
 import argparse
@@ -82,7 +82,7 @@ def visualize_audio_signals(config, row, fig, ax):
     
     return fig, ax
 
-def visualize_audio_tones(row, fig, ax):
+def visualize_audio_acoustics(row, fig, ax):
     audio_file = row['audio_path']
 
     # Load audio file
@@ -98,7 +98,6 @@ def visualize_audio_tones(row, fig, ax):
     tone_features = []
     for segment in audio_segments:
         chroma = librosa.feature.chroma_stft(y=segment, sr=sr)
-
         # mfcc = librosa.feature.mfcc(y=segment, sr=sr)
         # spectral_contrast = librosa.feature.spectral_contrast(y=segment, sr=sr)
         # tonnetz = librosa.feature.tonnetz(y=segment, sr=sr)
@@ -146,6 +145,31 @@ def visualize_gt(row, fig, ax):
     
     return fig, ax
 
+def visualize_audio_pitch_and_loudness(row, fig, ax):
+    # Load audio file
+    clip, sr = librosa.load(row['audio_path'], sr=None)
+
+    # Compute pitch and loudness
+    pitches, magnitudes = librosa.piptrack(y=clip, sr=sr)
+    pitch = np.nanmean(pitches, axis=0)
+    loudness = np.nanmean(librosa.power_to_db(magnitudes, ref=np.max), axis=0)
+
+    # Compute time array
+    frame_times = librosa.frames_to_time(np.arange(pitch.shape[0]), sr=sr, hop_length=512)
+    time_diffs = np.diff(frame_times)
+    times = np.cumsum(np.concatenate([[0], time_diffs]))
+
+    # Plot pitch
+    ax.plot(times, pitch, label='Pitch', color='blue')
+    ax.set_ylabel('Pitch (Hz)')
+    ax.legend()
+
+    # ax.plot(times, loudness.T, label='Loudness', color='green')
+    # ax.set_ylabel('Loudness (dB)')
+    # ax.legend()
+    
+    return fig, ax
+
 if __name__ == "__main__":
     ##### Defining arguments #####
     parser = argparse.ArgumentParser(
@@ -159,7 +183,7 @@ if __name__ == "__main__":
     data = pd.read_csv(config.dataset.input_path)
     
     # Create the output directory if it doesn't already exist
-    output_dir = Path('output/features_visualization')
+    output_dir = Path('output/pitch_features_visualization')
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Iterate over the first 10 rows of data
@@ -168,7 +192,8 @@ if __name__ == "__main__":
         fig, ax = plt.subplots()
         fig, ax = visualize_gt(row, fig, ax)
         try:
-            fig, ax = visualize_audio_tones(row, fig, ax)
+            # fig, ax = visualize_audio_acoustics(row, fig, ax)
+            fig, ax = visualize_audio_pitch_and_loudness(row, fig, ax)
         except:
             continue
         
