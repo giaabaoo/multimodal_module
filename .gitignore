@@ -9,3 +9,4 @@ checkpoints/
 *.mp4
 *.npy
 *.json
+*.png

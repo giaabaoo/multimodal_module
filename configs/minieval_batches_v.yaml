@@ -10,13 +10,15 @@ network:
   model_name: enet_b0_8_best_afew
   threshold_dying_track_len: 30
   threshold_iou_min_track: 0.4
-  # min_frame_per_second: 3 # skip frame info.
-  max_idx_frame_debug: null
-  len_face_tracks: 30
+  min_frame_per_second: 1 # skip frame info.
+  max_idx_frame_debug: 2000
+  len_face_tracks: 5
   num_intervals: 2
   max_cp_found: 1
+  # min_seconds_per_segment: 200
+  iou_threshold: 0.5
   min_face_size: 50
+  visualize_debug_face_track: True
+  similarity_threshold: 0.8
   use_audio_features: False
   use_visual_features: True
-  # min_seconds_per_segment: 200
-  # visualize_debug_face_track: True

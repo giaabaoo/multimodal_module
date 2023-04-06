@@ -37,7 +37,7 @@ def get_unsupervised_scores(config, ES_extractor, AudioES_extractor):
         # update configuration of ES extractor with new video information
         ES_extractor.update_args(config)
         # extract ES signals, all emotion category tracks, and all start-end offset tracks
-        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
+        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames_DS(video, config.network.min_frame_per_second)
     
     
     # pdb.set_trace()
@@ -158,7 +158,7 @@ def run_pipeline_single_video(config, ES_extractor, AudioES_extractor):
         # update configuration of ES extractor with new video information
         ES_extractor.update_args(config)
         # extract ES signals, all emotion category tracks, and all start-end offset tracks
-        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames(video)
+        es_signals, all_emotion_category_tracks, all_start_end_offset_track = ES_extractor.extract_sequence_frames_DS(video, config.network.min_frame_per_second)
     
     # pdb.set_trace()
     if config.network.use_audio_features:

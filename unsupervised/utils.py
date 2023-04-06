@@ -52,6 +52,11 @@ def prepare_configs(args):
     config.output_path = output_path
     Path(output_path).mkdir(parents=True, exist_ok=True)
     
+    if config.network.use_visual_features:
+        print("Using visual features...")
+    if config.network.use_audio_features:
+        print("Using audio features...")
+        
     return config
 
 def prepare_architectures(config):

@@ -9,7 +9,7 @@ from tqdm import tqdm
 from moviepy.editor import *
 import multiprocessing
 
-def process_video(config, row, ES_extractor, AudioES_extractor):
+def process_row(config, row, ES_extractor, AudioES_extractor):
     video_path = row['file_path']
     config.start_second = row['start_second']
     config.end_second = row['end_second']
@@ -27,15 +27,13 @@ def process_video(config, row, ES_extractor, AudioES_extractor):
     run_pipeline_single_video(config, ES_extractor, AudioES_extractor)  
 
 def inference(config, ES_extractor, AudioES_extractor):
-    processes = []
-    for index, row in tqdm(config.df.iterrows(), mininterval=0.1):
-        multiprocessing.set_start_method('forkserver', force=True)
-        p = multiprocessing.Process(target=process_video, args=(config, row, ES_extractor, AudioES_extractor))
-        p.start()
-        processes.append(p)
-        
-    for p in processes:
-        p.join()
+    pool = multiprocessing.Pool(processes=4)
+    try:
+        results = pool.starmap(process_row, [(config, row, ES_extractor, AudioES_extractor) for index, row in config.df.iterrows()])
+    finally:
+        pool.close()
+        pool.join()
+
 
 # def inference(config, ES_extractor, AudioES_extractor):
 #     for index, row in tqdm(config.df.iterrows(), mininterval=0.1):
@@ -57,6 +55,7 @@ def inference(config, ES_extractor, AudioES_extractor):
         
 if __name__ == "__main__":
     ##### Defining arguments #####
+    multiprocessing.set_start_method('spawn', force=True)
     parser = argparse.ArgumentParser(
         "UCP detection inference on multi-modal data", parents=[get_args_parser()])
     args = parser.parse_args()
