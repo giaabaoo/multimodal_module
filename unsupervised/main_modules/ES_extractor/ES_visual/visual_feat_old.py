@@ -285,7 +285,7 @@ class VisualES():
                     ### then do update
                     all_es_feat_tracks[best_match_track_id] = np.append(all_es_feat_tracks[best_match_track_id], [es_feature], axis=0) # add more feature for this track
                     all_start_end_offset_track[best_match_track_id][-1] = idx_frame # change index frame
-
+                    
                     if self.args.network.visualize_debug_face_track == True:
                     # FOR VISUALIZING ONLY
                         draw_face_track_bbox.append([box, all_tracks[best_match_track_id]['id']])
@@ -340,7 +340,7 @@ if __name__ == "__main__":
         config_dict = yaml.safe_load(f)
     print(config_dict)
     config = DotMap(config_dict)
-    path_test_video = "/home/dhgbao/Research_Monash/dataset/ccu-data/CCU_COMBINED_ANNOTATED_VIDEO/all_videos/M01000AJ7_0008.mp4"
+    path_test_video = "/home/dhgbao/Research_Monash/dataset/ccu-data/CCU_COMBINED_ANNOTATED_VIDEO/all_videos/M01004JM6_0005.mp4"
     config.video_name = path_test_video.split("/")[-1].replace(".mp4", "")
     face_detector = MTCNN(keep_all=False, post_process=True, min_face_size=config.network.min_face_size, device=config.pipeline.device)
     emotion_recognizer = HSEmotionRecognizer(model_name=config.network.model_name, device=config.pipeline.device)
