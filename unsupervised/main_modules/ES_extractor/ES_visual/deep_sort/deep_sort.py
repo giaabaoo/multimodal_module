@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import pdb
 
 from .deep.feature_extractor import Extractor, FastReIDExtractor
 from .sort.nn_matching import NearestNeighborDistanceMetric
@@ -31,7 +32,6 @@ class DeepSort(object):
         features = self._get_features(bbox_xywh, ori_img)
         bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
-
         # run on non-maximum supression
         boxes = np.array([d.tlwh for d in detections])
         scores = np.array([d.confidence for d in detections])
@@ -105,6 +105,7 @@ class DeepSort(object):
     def _get_features(self, bbox_xywh, ori_img):
         im_crops = []
         for box in bbox_xywh:
+           
             x1,y1,x2,y2 = self._xywh_to_xyxy(box)
             im = ori_img[y1:y2,x1:x2]
             im_crops.append(im)

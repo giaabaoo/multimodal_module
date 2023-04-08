@@ -109,8 +109,9 @@ class Track:
         ret[2:] = ret[:2] + ret[2:]
         return ret
     
-    def to_x1y1x2y2(self):
-        """BAO get current position in bounding box format `(x1, y1, x2, y2)`.
+    def to_tlbr_debug(self):
+        """Get current position in bounding box format `(min x, miny, max x,
+        max y)`.
 
         Returns
         -------
@@ -118,8 +119,38 @@ class Track:
             The bounding box.
 
         """
+        ret = self.to_tlwh_debug()
+        ret[2:] = ret[:2] + ret[2:]
+        return ret
+    def to_tlwh_debug(self):
+        """Get current position in bounding box format `(top left x, top left y,
+        width, height)`.
+
+        Returns
+        -------
+        ndarray
+            The bounding box.
+
+        """
+        import pdb
+        pdb.set_trace()
         ret = self.mean[:4].copy()
         ret[2] *= ret[3]
+        ret[:2] -= ret[2:] / 2
+        return ret
+    
+    def to_x1y1x2y2(self):
+        """BAO get current position in bounding box format `(x1, y1, x2, y2)`.
+
+        Returns
+        -------
+        ndarray
+            The bounding box.
+            [208.29218 ,  32.552822, 326.1606  , 172.83759 ]
+
+        """
+        ret = self.mean[:4].copy()
+        ret[:2] -= ret[2:] / 2
         return ret
 
     def predict(self, kf):
