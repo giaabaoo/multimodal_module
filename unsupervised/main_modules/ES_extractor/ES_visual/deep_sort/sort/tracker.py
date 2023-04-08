@@ -5,7 +5,7 @@ from . import kalman_filter
 from . import linear_assignment
 from . import iou_matching
 from .track import Track
-
+import pdb
 
 class Tracker:
     """
@@ -55,7 +55,7 @@ class Tracker:
         for track in self.tracks:
             track.predict(self.kf)
 
-    def update(self, detections):
+    def update(self, detections, check):
         """Perform measurement update and track management.
 
         Parameters
@@ -65,8 +65,10 @@ class Tracker:
 
         """
         # Run matching cascade.
+        if check:
+            pdb.set_trace()
         matches, unmatched_tracks, unmatched_detections = \
-            self._match(detections)
+            self._match(detections, check)
 
         # Update track set.
         for track_idx, detection_idx in matches:
@@ -90,7 +92,7 @@ class Tracker:
         self.metric.partial_fit(
             np.asarray(features), np.asarray(targets), active_targets)
 
-    def _match(self, detections):
+    def _match(self, detections, check):
 
         def gated_metric(tracks, dets, track_indices, detection_indices):
             features = np.array([dets[i].feature for i in detection_indices])
@@ -101,7 +103,9 @@ class Tracker:
                 detection_indices)
 
             return cost_matrix
-
+        
+        if check:
+            pdb.set_trace()
         # Split track set into confirmed and unconfirmed tracks.
         confirmed_tracks = [
             i for i, t in enumerate(self.tracks) if t.is_confirmed()]
